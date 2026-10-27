@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'photo_storage.dart';
 import 'package:flutter/material.dart';
 
 const cream = Color(0xFFF8F8F0),
@@ -418,8 +418,8 @@ Widget localPhoto(String? path, {double height = 190}) => path == null
       )
     : ClipRRect(
         borderRadius: BorderRadius.circular(12),
-        child: Image.file(
-          File(path),
+        child: Image(
+          image: photoProvider(path),
           height: height,
           width: double.infinity,
           fit: BoxFit.cover,

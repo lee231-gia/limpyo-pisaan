@@ -1,7 +1,7 @@
-import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:path_provider/path_provider.dart';
+import 'photo_storage.dart';
 import 'state.dart';
 import 'ui.dart';
 import 'photo_picker.dart';
@@ -25,7 +25,7 @@ class _AddShowcasePageState extends State<AddShowcasePage> {
   }
 
   Future<void> recoverPhoto() async {
-    if (!Platform.isAndroid) return;
+    if (kIsWeb || defaultTargetPlatform != TargetPlatform.android) return;
     try {
       final lost = await OwnedPhotoPicker.recover('showcase');
       if (lost != null) await keepPhoto(lost);
@@ -33,24 +33,14 @@ class _AddShowcasePageState extends State<AddShowcasePage> {
   }
 
   Future<void> keepPhoto(XFile picked) async {
-    final dir = await getApplicationDocumentsDirectory();
-    final folder = await Directory(
-      '${dir.path}/showcase_photos',
-    ).create(recursive: true);
-    final copy = await File(
-      picked.path,
-    ).copy('${folder.path}/${DateTime.now().microsecondsSinceEpoch}.jpg');
+    final saved = await storePhoto(picked, 'showcase');
     if (!mounted) {
-      await copy.delete();
+      await deletePhoto(saved);
       return;
     }
     final old = photo;
-    setState(() => photo = copy.path);
-    if (old != null) {
-      try {
-        await File(old).delete();
-      } catch (_) {}
-    }
+    setState(() => photo = saved);
+    await deletePhoto(old);
   }
 
   Future<void> pick(ImageSource source) async {
@@ -90,7 +80,7 @@ class _AddShowcasePageState extends State<AddShowcasePage> {
     title.dispose();
     story.dispose();
     if (!saved && photo != null) {
-      File(photo!).delete().catchError((_) => File(photo!));
+      deletePhoto(photo);
     }
     super.dispose();
   }
@@ -169,7 +159,7 @@ class _AddShowcasePageState extends State<AddShowcasePage> {
                         : () {
                             final old = photo!;
                             setState(() => photo = null);
-                            File(old).delete().catchError((_) => File(old));
+                            deletePhoto(old);
                           },
                     icon: const Icon(Icons.close),
                     label: const Text('Remove photo'),

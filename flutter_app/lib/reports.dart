@@ -1,7 +1,7 @@
-import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:path_provider/path_provider.dart';
+import 'photo_storage.dart';
 import 'state.dart';
 import 'ui.dart';
 import 'photo_picker.dart';
@@ -46,7 +46,7 @@ class _ReportFormPageState extends State<ReportFormPage> {
   }
 
   Future<void> recoverPhoto() async {
-    if (!Platform.isAndroid) return;
+    if (kIsWeb || defaultTargetPlatform != TargetPlatform.android) return;
     try {
       final lost = await OwnedPhotoPicker.recover('report');
       if (lost != null) await savePhoto(lost);
@@ -56,25 +56,14 @@ class _ReportFormPageState extends State<ReportFormPage> {
   }
 
   Future<void> savePhoto(XFile photo) async {
-    final directory = await getApplicationDocumentsDirectory();
-    final folder = await Directory(
-      '${directory.path}/report_photos',
-    ).create(recursive: true);
-    final saved = await File(
-      photo.path,
-    ).copy('${folder.path}/${DateTime.now().microsecondsSinceEpoch}.jpg');
+    final saved = await storePhoto(photo, 'report');
     if (!mounted) {
-      await saved.delete();
+      await deletePhoto(saved);
       return;
     }
     final old = widget.draft.photo;
-    widget.draft.photo = saved.path;
-    if (old != null && old.startsWith(folder.path)) {
-      try {
-        await File(old).delete();
-      } catch (_) {}
-    }
-    if (mounted) setState(() {});
+    setState(() => widget.draft.photo = saved);
+    await deletePhoto(old);
   }
 
   Future<void> pickPhoto(ImageSource source) async {

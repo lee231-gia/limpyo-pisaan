@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'auth.dart';
 import 'shell.dart';
@@ -19,7 +20,17 @@ class LimpyoApp extends StatelessWidget {
         systemNavigationBarColor: cream,
         systemNavigationBarIconBrightness: Brightness.dark,
       ),
-      child: child!,
+      child: kIsWeb
+          ? ColoredBox(
+              color: pale,
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 480),
+                  child: child!,
+                ),
+              ),
+            )
+          : child!,
     ),
     home: AnimatedBuilder(
       animation: state,

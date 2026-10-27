@@ -27,3 +27,9 @@ In Updates → Showcase, tap **Add showcase**. Enter a title and story, optional
 In Report an Issue, choose **Other waste-related concern** and enter **Specify issue**. The custom name is required, appears in review, and is retained in My Reports. Existing predefined issues continue to work.
 
 The eight supplied Bisaya-English posts appear in Showcase (three stories) and Announcements (education, drainage and cleanliness). All supplied community photographs remain bundled offline. Android photo recovery tracks its originating form so showcase photos cannot attach to reports after a process restart.
+
+## Interactive browser app
+
+Open https://lee231-gia.github.io/limpyo-pisaan-preview/ without installing anything. This runs the same Flutter screens in a centered mobile layout. Reports, showcases and selected images persist in the current browser. Clearing site data removes them; there is no backend or cross-device sharing. Browser storage capacity varies, so save smaller photos if the browser reports a storage failure.
+
+Run locally with `flutter run -d chrome`. Publish updates from the repository root with `./scripts/publish-web-preview.ps1` while signed into GitHub CLI. The script builds Flutter web and updates the separate public compiled-preview repository; the app source stays in the private repository. GitHub Pages serves the compiled repository's main branch. The source repository's Browser Preview workflow also provides a downloadable build artifact.

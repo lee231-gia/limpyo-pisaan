@@ -1,5 +1,7 @@
 # Limpyo Pisaan Flutter app
 
+**Interactive browser app:** [https://lee231-gia.github.io/limpyo-pisaan-preview/](https://lee231-gia.github.io/limpyo-pisaan-preview/) — open and use without installing an APK.
+
 The current mobile app is built with **Flutter and Dart**, using native Flutter widgets. It implements the Phase 5 prototype with no WebView, JavaScript UI, backend, or hosted website requirement.
 
 ## Source and APK
