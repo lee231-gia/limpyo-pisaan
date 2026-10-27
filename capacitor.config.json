@@ -1,0 +1,10 @@
+{
+  "appId": "com.limpyopisaan.app",
+  "appName": "Limpyo Pisaan",
+  "webDir": "dist",
+  "backgroundColor": "#f8f8f0",
+  "android": {
+    "backgroundColor": "#f8f8f0",
+    "allowMixedContent": false
+  }
+}
