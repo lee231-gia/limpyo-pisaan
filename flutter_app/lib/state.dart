@@ -105,6 +105,17 @@ class ServiceSettings {
     this.dropoffPinX = .28,
     this.dropoffPinY = .43,
   });
+
+  static double _safePin(dynamic value, double fallback) {
+    final parsed = value is num
+        ? value.toDouble()
+        : double.tryParse(value?.toString() ?? '');
+    if (parsed == null || !parsed.isFinite || parsed < .05 || parsed > .95) {
+      return fallback;
+    }
+    return parsed;
+  }
+
   factory ServiceSettings.fromJson(
     Map<String, dynamic> json,
   ) => ServiceSettings(
@@ -118,8 +129,8 @@ class ServiceSettings {
     acceptedWaste:
         json['acceptedWaste'] as String? ?? 'Plastic bottles · clean and dry',
     operatingHours: json['operatingHours'] as String? ?? '8:00 AM – 11:00 AM',
-    dropoffPinX: (json['dropoffPinX'] as num?)?.toDouble() ?? .28,
-    dropoffPinY: (json['dropoffPinY'] as num?)?.toDouble() ?? .43,
+    dropoffPinX: _safePin(json['dropoffPinX'], .28),
+    dropoffPinY: _safePin(json['dropoffPinY'], .43),
   );
   Map<String, dynamic> toJson() => {
     'collectionDay': collectionDay,

@@ -642,7 +642,7 @@ class AnnouncementDetailPage extends StatelessWidget {
 }
 
 class CommunityMap extends StatelessWidget {
-  final double pinX, pinY;
+  final num? pinX, pinY;
   final ValueChanged<Offset>? onPinChanged;
   final bool editable;
   const CommunityMap({
@@ -653,91 +653,107 @@ class CommunityMap extends StatelessWidget {
     this.editable = false,
   });
   @override
-  Widget build(BuildContext context) => Semantics(
-    button: editable,
-    label: editable ? 'Tap map to place drop-off pin' : 'Drop-off map location',
-    child: ClipRRect(
-      borderRadius: BorderRadius.circular(14),
-      child: Container(
-        height: 210,
-        color: pale,
-        child: LayoutBuilder(
-          builder: (context, box) => GestureDetector(
-            onTapDown: editable
-                ? (details) {
-                    final x = (details.localPosition.dx / box.maxWidth).clamp(
-                      .06,
-                      .94,
-                    );
-                    final y = (details.localPosition.dy / box.maxHeight).clamp(
-                      .10,
-                      .88,
-                    );
-                    onPinChanged?.call(Offset(x, y));
-                  }
-                : null,
-            child: Stack(
-              children: [
-                Positioned(
-                  left: box.maxWidth * .10,
-                  top: 25,
-                  child: Container(
-                    width: box.maxWidth * .3,
-                    height: 80,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFB4C4A0),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: const Color(0xFFD7E0CA),
-                        width: 9,
+  Widget build(BuildContext context) {
+    final safePinX = _safePin(pinX, .28);
+    final safePinY = _safePin(pinY, .43);
+    return Semantics(
+      button: editable,
+      label: editable
+          ? 'Tap map to place drop-off pin'
+          : 'Drop-off map location',
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(14),
+        child: Container(
+          height: 210,
+          color: pale,
+          child: LayoutBuilder(
+            builder: (context, box) => GestureDetector(
+              onTapDown: editable
+                  ? (details) {
+                      final x = (details.localPosition.dx / box.maxWidth)
+                          .clamp(.06, .94)
+                          .toDouble();
+                      final y = (details.localPosition.dy / box.maxHeight)
+                          .clamp(.10, .88)
+                          .toDouble();
+                      onPinChanged?.call(Offset(x, y));
+                    }
+                  : null,
+              child: Stack(
+                children: [
+                  Positioned(
+                    left: box.maxWidth * .10,
+                    top: 25,
+                    child: Container(
+                      width: box.maxWidth * .3,
+                      height: 80,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFB4C4A0),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: const Color(0xFFD7E0CA),
+                          width: 9,
+                        ),
                       ),
                     ),
                   ),
-                ),
-                Positioned(
-                  right: 15,
-                  bottom: 15,
-                  child: Container(
-                    width: box.maxWidth * .32,
-                    height: 60,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFA4BA8B),
-                      borderRadius: BorderRadius.circular(10),
+                  Positioned(
+                    right: 15,
+                    bottom: 15,
+                    child: Container(
+                      width: box.maxWidth * .32,
+                      height: 60,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFA4BA8B),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                     ),
                   ),
-                ),
-                Positioned(
-                  left: box.maxWidth * .45,
-                  top: 0,
-                  bottom: 0,
-                  child: Container(width: 23, color: Colors.white),
-                ),
-                Positioned(
-                  left: 0,
-                  right: 0,
-                  top: 115,
-                  child: Container(height: 22, color: Colors.white),
-                ),
-                Positioned(
-                  left: (box.maxWidth * pinX) - 21,
-                  top: (box.maxHeight * pinY) - 42,
-                  child: const Icon(Icons.location_on, color: green, size: 42),
-                ),
-                const Positioned(
-                  left: 10,
-                  bottom: 8,
-                  child: Text(
-                    'PUROK 3 · BARANGAY PISAAN',
-                    style: TextStyle(fontSize: 8, color: muted),
+                  Positioned(
+                    left: box.maxWidth * .45,
+                    top: 0,
+                    bottom: 0,
+                    child: Container(width: 23, color: Colors.white),
                   ),
-                ),
-              ],
+                  Positioned(
+                    left: 0,
+                    right: 0,
+                    top: 115,
+                    child: Container(height: 22, color: Colors.white),
+                  ),
+                  Positioned(
+                    left: (box.maxWidth * safePinX) - 21,
+                    top: (box.maxHeight * safePinY) - 42,
+                    child: const Icon(
+                      Icons.location_on,
+                      color: green,
+                      size: 42,
+                    ),
+                  ),
+                  const Positioned(
+                    left: 10,
+                    bottom: 8,
+                    child: Text(
+                      'PUROK 3 · BARANGAY PISAAN',
+                      style: TextStyle(fontSize: 8, color: muted),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
       ),
-    ),
-  );
+    );
+  }
+
+  double _safePin(num? value, double fallback) {
+    final parsed = value?.toDouble();
+    if (parsed == null || !parsed.isFinite || parsed < .05 || parsed > .95) {
+      return fallback;
+    }
+    return parsed;
+  }
 }
 
 class CollectionPage extends StatelessWidget {

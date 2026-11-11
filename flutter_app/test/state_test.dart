@@ -131,4 +131,15 @@ void main() {
     expect(reloaded.services.dropoffPinX, .72);
     expect(reloaded.services.dropoffPinY, .61);
   });
+  test('missing or invalid saved drop-off pins use safe defaults', () async {
+    SharedPreferences.setMockInitialValues({
+      'services': jsonEncode({
+        'dropoffPinX': null,
+        'dropoffPinY': 'not-a-number',
+      }),
+    });
+    final state = AppState(await SharedPreferences.getInstance());
+    expect(state.services.dropoffPinX, .28);
+    expect(state.services.dropoffPinY, .43);
+  });
 }
