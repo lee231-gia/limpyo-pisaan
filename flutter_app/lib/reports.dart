@@ -490,16 +490,16 @@ class ReportSuccessPage extends StatelessWidget {
         ),
       ),
       space(30),
-      Center(child: eyebrow('THANK YOU FOR CARING')),
+      Center(child: eyebrow('SUBMITTED TO MANAGEMENT')),
       space(20),
       Text(
-        'Report saved\nsuccessfully!',
+        'Report sent\nsuccessfully!',
         textAlign: TextAlign.center,
         style: Theme.of(context).textTheme.headlineMedium,
       ),
       space(16),
       const Text(
-        'Your small step helps tell the story\nof a cleaner community.',
+        'Barangay Management can now review\nyour report on this device.',
         textAlign: TextAlign.center,
         style: TextStyle(color: muted, fontSize: 13, height: 1.8),
       ),
@@ -517,7 +517,7 @@ class ReportSuccessPage extends StatelessWidget {
               ),
               space(12),
               const Text(
-                'Saved to My Reports',
+                'Ready for management review',
                 style: TextStyle(color: muted, fontSize: 10),
               ),
             ],
@@ -526,8 +526,8 @@ class ReportSuccessPage extends StatelessWidget {
       ),
       space(22),
       const Notice(
-        'Your report has been saved. You can find its details in My Reports.',
-        icon: Icons.shield_outlined,
+        'You can follow its status and any official response in My Reports.',
+        icon: Icons.assignment_turned_in_outlined,
       ),
       primaryButton(
         'View My Reports',
@@ -696,6 +696,13 @@ class ReportDetailsPage extends StatelessWidget {
         description: report.description,
         photo: report.photo,
       ),
+      if (report.officialResponse?.trim().isNotEmpty == true) ...[
+        const SectionTitle('Management response'),
+        Notice(
+          report.officialResponse!,
+          icon: Icons.admin_panel_settings_outlined,
+        ),
+      ],
       const SectionTitle('Report history'),
       Surface(
         child: Column(

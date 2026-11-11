@@ -85,4 +85,39 @@ void main() {
       expect(state.name, 'Resident');
     },
   );
+  test('official demo and management updates persist locally', () async {
+    final prefs = await SharedPreferences.getInstance();
+    final state = AppState(prefs);
+    await state.enterDemo(official: true);
+    expect(state.name, 'Barangay Official');
+    expect(state.isOfficial, isTrue);
+
+    final report = await state.submitReport(
+      ReportDraft(
+        type: 'Illegal dumping',
+        location: 'Canal by the road',
+        description: 'Mixed waste is blocking the drainage.',
+      ),
+    );
+    await state.updateReport(
+      report.id,
+      status: 'In Progress',
+      response: 'Thank you. The team will inspect the area today.',
+    );
+    await state.addAnnouncement(
+      title: 'Drainage clean-up',
+      body: 'Please keep the canal clear before the next rainfall.',
+      category: 'COMMUNITY ACTION',
+    );
+    await state.updateServices(
+      const ServiceSettings(dropoffName: 'Covered court drop-off point'),
+    );
+
+    final reloaded = AppState(prefs);
+    expect(reloaded.isOfficial, isTrue);
+    expect(reloaded.reports.single.status, 'In Progress');
+    expect(reloaded.reports.single.officialResponse, contains('inspect'));
+    expect(reloaded.announcements.single.title, 'Drainage clean-up');
+    expect(reloaded.services.dropoffName, 'Covered court drop-off point');
+  });
 }

@@ -53,13 +53,15 @@ For an APK built by GitHub, open **Actions → Build Flutter Android APK → Run
 
 ## Included flows
 
-Welcome, login and guest access, registration validation, account help, home, announcement/showcase tabs and details, collection notice/sample schedule/drop-off map, report issue picker, required-field errors, landmark suggestions, camera/gallery photo attachment, review/edit, local submission and unique reference, report filters and history, profile, waste guide, read-state notifications, about, and logout confirmation.
+Welcome, normal login, Resident demo and Barangay Official demo access, registration validation, account help, home, announcement/showcase tabs and details, collection notice/sample schedule/drop-off map, report issue picker (including a custom issue option), required-field errors, landmark suggestions, camera/gallery photo attachment, review/edit, local submission and unique reference, report filters and history, profile, waste guide, read-state notifications, about, and logout confirmation.
+
+The Official demo includes Barangay Management: a report inbox with responses and status updates, announcements, community showcase access, and editable collection and drop-off details. A management response can be saved for the reporter or saved together with a community-action announcement.
 
 The interface uses native Flutter Material widgets, the green-and-cream Phase 5 palette, labeled bottom navigation, bundled local artwork, scrollable forms, system back navigation and portrait orientation.
 
 ## Local demo data
 
-`shared_preferences` stores the sample profile, report list and notification state on the device. `image_picker` and `path_provider` attach and retain optional photos in the app's private documents directory. Passwords are never stored. Sign-in, notifications, status history, maps, collection details and report delivery are demonstrations. No report reaches barangay officials. Use sample data; authentication is simulated. Uninstalling the app removes its local data.
+`shared_preferences` stores the profile, reports, management responses, announcements, service details, and notification state on the device. `image_picker` and `path_provider` attach and retain optional photos in the app's private documents directory. Passwords are never stored. Sign-in, Resident demo, and Official demo are presentation flows. No report reaches a different device or a real barangay office until a backend is added. Use sample data; authentication is simulated. Uninstalling the app removes its local data.
 
 All content and artwork are bundled and can open offline. The native Flutter Android release does not require internet permission or a hosted website.
 

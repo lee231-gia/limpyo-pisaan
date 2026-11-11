@@ -75,7 +75,13 @@ class ProfilePage extends StatelessWidget {
         style: const TextStyle(color: muted, fontSize: 12),
       ),
       space(14),
-      const Center(child: Tag('RESIDENT · PUROK 3')),
+      Center(
+        child: Tag(
+          state.isOfficial
+              ? 'BARANGAY OFFICIAL · PUROK 3'
+              : 'RESIDENT · PUROK 3',
+        ),
+      ),
       space(12),
       const Text(
         'Purok 3 · Barangay Pisaan',
@@ -89,6 +95,61 @@ class ProfilePage extends StatelessWidget {
         subtitle: 'Your reports and status history',
         onTap: () => open('reports'),
       ),
+      MenuCard(
+        icon: Icons.admin_panel_settings_outlined,
+        title: state.isOfficial
+            ? 'Barangay Management'
+            : 'Switch to Barangay Management',
+        subtitle: state.isOfficial
+            ? 'Review reports, publish updates, and manage services'
+            : 'Use this device as an official management view',
+        onTap: () async {
+          if (!state.isOfficial) {
+            final approved = await showDialog<bool>(
+              context: context,
+              builder: (context) => AlertDialog(
+                title: const Text('Use Barangay Management?'),
+                content: const Text(
+                  'This enables the official tools on this device. Reports, responses, announcements, and service details remain local because this app has no backend.',
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context, false),
+                    child: const Text('Cancel'),
+                  ),
+                  FilledButton(
+                    onPressed: () => Navigator.pop(context, true),
+                    child: const Text('Continue'),
+                  ),
+                ],
+              ),
+            );
+            if (approved != true) return;
+            try {
+              await state.setOfficialMode(true);
+            } catch (_) {
+              if (context.mounted)
+                showMessage(context, 'Could not switch to management mode.');
+              return;
+            }
+          }
+          if (context.mounted) open('management');
+        },
+      ),
+      if (state.isOfficial)
+        MenuCard(
+          icon: Icons.person_outline,
+          title: 'Use Resident View',
+          subtitle: 'Return this device to the resident experience',
+          onTap: () async {
+            try {
+              await state.setOfficialMode(false);
+            } catch (_) {
+              if (context.mounted)
+                showMessage(context, 'Could not switch to resident view.');
+            }
+          },
+        ),
       MenuCard(
         icon: Icons.menu_book_outlined,
         title: 'Waste Guide',
@@ -116,7 +177,7 @@ class ProfilePage extends StatelessWidget {
       ),
       space(18),
       const Text(
-        'Limpyo Pisaan · Community waste information\nVersion 1.3 · Barangay Pisaan',
+        'Limpyo Pisaan · Community waste information\nVersion 1.4 · Barangay Pisaan',
         textAlign: TextAlign.center,
         style: TextStyle(color: muted, fontSize: 10, height: 1.8),
       ),

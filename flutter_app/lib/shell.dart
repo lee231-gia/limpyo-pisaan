@@ -5,6 +5,7 @@ import 'community.dart';
 import 'reports.dart';
 import 'profile.dart';
 import 'showcase_authoring.dart';
+import 'management.dart';
 
 class AppShell extends StatefulWidget {
   final AppState state;
@@ -47,7 +48,8 @@ class _AppShellState extends State<AppShell> {
     if (page.startsWith('post:') ||
         page.startsWith('show:') ||
         page == 'updates' ||
-        page.startsWith('resident:')) {
+        page.startsWith('resident:') ||
+        page.startsWith('announcement:')) {
       return 1;
     }
     if (page == 'collection' || page == 'dropoff') return 2;
@@ -58,8 +60,13 @@ class _AppShellState extends State<AppShell> {
           'guide',
           'notifications',
           'about',
+          'management',
+          'management-reports',
+          'manage-announcements',
+          'manage-services',
         ].contains(page) ||
-        page.startsWith('details:')) {
+        page.startsWith('details:') ||
+        page.startsWith('manage-report:')) {
       return 4;
     }
     return 0;
@@ -72,9 +79,9 @@ class _AppShellState extends State<AppShell> {
       case 'updates':
         return UpdatesPage(open: open, state: widget.state);
       case 'collection':
-        return CollectionPage(open: open);
+        return CollectionPage(open: open, state: widget.state);
       case 'dropoff':
-        return DropoffPage(back: back);
+        return DropoffPage(back: back, state: widget.state);
       case 'report':
         return ReportFormPage(draft: draft, review: () => open('review'));
       case 'review':
@@ -114,6 +121,18 @@ class _AppShellState extends State<AppShell> {
         return NotificationsPage(state: widget.state, open: open, back: back);
       case 'about':
         return AboutPage(back: back);
+      case 'management':
+        return ManagementPage(state: widget.state, open: open, back: back);
+      case 'management-reports':
+        return ManagementReportsPage(
+          state: widget.state,
+          open: open,
+          back: back,
+        );
+      case 'manage-announcements':
+        return ManageAnnouncementsPage(state: widget.state, back: back);
+      case 'manage-services':
+        return ManageServicesPage(state: widget.state, back: back);
     }
     if (page.startsWith('post:')) {
       return PostPage(
@@ -135,11 +154,32 @@ class _AppShellState extends State<AppShell> {
         return ResidentShowcasePage(entry: entries.first, back: back);
       }
     }
+    if (page.startsWith('announcement:')) {
+      final id = page.substring('announcement:'.length);
+      final entries = widget.state.announcements.where(
+        (entry) => entry.id == id,
+      );
+      if (entries.isNotEmpty) {
+        return AnnouncementDetailPage(entry: entries.first, back: back);
+      }
+    }
     if (page.startsWith('details:')) {
       final id = page.substring(8);
       final matches = widget.state.reports.where((report) => report.id == id);
       if (matches.isNotEmpty) {
         return ReportDetailsPage(report: matches.first, back: back);
+      }
+    }
+    if (page.startsWith('manage-report:')) {
+      final id = page.substring('manage-report:'.length);
+      final matches = widget.state.reports.where((report) => report.id == id);
+      if (matches.isNotEmpty) {
+        return ManageReportPage(
+          state: widget.state,
+          report: matches.first,
+          back: back,
+          open: open,
+        );
       }
     }
     return PageBody(children: [PageHeading('Page unavailable', back: back)]);

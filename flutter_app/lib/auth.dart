@@ -91,6 +91,20 @@ class _AuthScreenState extends State<AuthScreen> {
     }
   }
 
+  Future<void> enterDemo(bool official) async {
+    FocusScope.of(context).unfocus();
+    setState(() => busy = true);
+    try {
+      await widget.state.enterDemo(official: official);
+    } catch (_) {
+      if (mounted) {
+        showMessage(context, 'Could not start the demo. Please try again.');
+      }
+    } finally {
+      if (mounted) setState(() => busy = false);
+    }
+  }
+
   Widget input(
     String label,
     TextEditingController controller,
@@ -336,6 +350,47 @@ class _AuthScreenState extends State<AuthScreen> {
                             style: TextStyle(fontSize: 12),
                           ),
                         ),
+                      ),
+                      space(15),
+                      const Center(
+                        child: Text(
+                          'PRESENTATION DEMOS',
+                          style: TextStyle(
+                            color: muted,
+                            fontSize: 9,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 1.1,
+                          ),
+                        ),
+                      ),
+                      space(10),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: OutlinedButton.icon(
+                              onPressed: busy ? null : () => enterDemo(false),
+                              icon: const Icon(Icons.person_outline, size: 17),
+                              label: const Text(
+                                'Resident demo',
+                                style: TextStyle(fontSize: 10),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: FilledButton.icon(
+                              onPressed: busy ? null : () => enterDemo(true),
+                              icon: const Icon(
+                                Icons.admin_panel_settings_outlined,
+                                size: 17,
+                              ),
+                              label: const Text(
+                                'Official demo',
+                                style: TextStyle(fontSize: 10),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                     if (signup)

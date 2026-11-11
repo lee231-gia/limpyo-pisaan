@@ -40,6 +40,72 @@ class ShowcaseEntry {
   };
 }
 
+class AnnouncementEntry {
+  final String id, title, body, date;
+  final String category;
+  const AnnouncementEntry({
+    required this.id,
+    required this.title,
+    required this.body,
+    required this.date,
+    required this.category,
+  });
+  factory AnnouncementEntry.fromJson(Map<String, dynamic> json) =>
+      AnnouncementEntry(
+        id: json['id'] as String,
+        title: json['title'] as String,
+        body: json['body'] as String,
+        date: json['date'] as String,
+        category: json['category'] as String,
+      );
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'title': title,
+    'body': body,
+    'date': date,
+    'category': category,
+  };
+}
+
+class ServiceSettings {
+  final String collectionDay, collectionTime, serviceArea, updateWindow;
+  final String dropoffName, dropoffLandmark, acceptedWaste, operatingHours;
+  const ServiceSettings({
+    this.collectionDay = 'Monday',
+    this.collectionTime = '8:00 AM',
+    this.serviceArea = 'Upper Pisaan',
+    this.updateWindow = '11:00 AM',
+    this.dropoffName = 'Community drop-off point',
+    this.dropoffLandmark = 'Purok 3 · Lower Pisaan',
+    this.acceptedWaste = 'Plastic bottles · clean and dry',
+    this.operatingHours = '8:00 AM – 11:00 AM',
+  });
+  factory ServiceSettings.fromJson(
+    Map<String, dynamic> json,
+  ) => ServiceSettings(
+    collectionDay: json['collectionDay'] as String? ?? 'Monday',
+    collectionTime: json['collectionTime'] as String? ?? '8:00 AM',
+    serviceArea: json['serviceArea'] as String? ?? 'Upper Pisaan',
+    updateWindow: json['updateWindow'] as String? ?? '11:00 AM',
+    dropoffName: json['dropoffName'] as String? ?? 'Community drop-off point',
+    dropoffLandmark:
+        json['dropoffLandmark'] as String? ?? 'Purok 3 · Lower Pisaan',
+    acceptedWaste:
+        json['acceptedWaste'] as String? ?? 'Plastic bottles · clean and dry',
+    operatingHours: json['operatingHours'] as String? ?? '8:00 AM – 11:00 AM',
+  );
+  Map<String, dynamic> toJson() => {
+    'collectionDay': collectionDay,
+    'collectionTime': collectionTime,
+    'serviceArea': serviceArea,
+    'updateWindow': updateWindow,
+    'dropoffName': dropoffName,
+    'dropoffLandmark': dropoffLandmark,
+    'acceptedWaste': acceptedWaste,
+    'operatingHours': operatingHours,
+  };
+}
+
 class ReportDraft {
   String type, location, description;
   String? photo;
@@ -61,6 +127,7 @@ class ReportDraft {
 class WasteReport {
   final String id, type, location, description, status, date;
   final String? photo;
+  final String? officialResponse;
   final bool sample;
   const WasteReport({
     required this.id,
@@ -70,6 +137,7 @@ class WasteReport {
     required this.status,
     required this.date,
     this.photo,
+    this.officialResponse,
     this.sample = false,
   });
   factory WasteReport.fromJson(Map<String, dynamic> json) => WasteReport(
@@ -80,6 +148,7 @@ class WasteReport {
     status: json['status'] as String,
     date: json['date'] as String,
     photo: json['photo'] as String?,
+    officialResponse: json['officialResponse'] as String?,
     sample: json['sample'] == true,
   );
   Map<String, dynamic> toJson() => {
@@ -90,8 +159,21 @@ class WasteReport {
     'status': status,
     'date': date,
     'photo': photo,
+    'officialResponse': officialResponse,
     'sample': sample,
   };
+  WasteReport copyWith({String? status, String? officialResponse}) =>
+      WasteReport(
+        id: id,
+        type: type,
+        location: location,
+        description: description,
+        status: status ?? this.status,
+        date: date,
+        photo: photo,
+        officialResponse: officialResponse ?? this.officialResponse,
+        sample: sample,
+      );
 }
 
 String formatDate(DateTime date) {
@@ -118,6 +200,9 @@ class AppState extends ChangeNotifier {
   late String name, email;
   late List<WasteReport> reports;
   List<ShowcaseEntry> showcases = [];
+  List<AnnouncementEntry> announcements = [];
+  ServiceSettings services = const ServiceSettings();
+  late bool isOfficial;
   late bool notificationsRead;
   AppState(this.prefs) {
     stage = prefs.getBool('signedIn') == true
@@ -132,6 +217,26 @@ class AppState extends ChangeNotifier {
     email = prefs.getString('email') ?? '';
     if (email == 'resident@example.com') email = '';
     notificationsRead = prefs.getBool('notificationsRead') ?? false;
+    isOfficial = prefs.getBool('isOfficial') ?? false;
+    try {
+      announcements =
+          (jsonDecode(prefs.getString('announcements') ?? '[]') as List)
+              .map(
+                (item) => AnnouncementEntry.fromJson(
+                  Map<String, dynamic>.from(item as Map),
+                ),
+              )
+              .toList();
+      final serviceData = prefs.getString('services');
+      if (serviceData != null) {
+        services = ServiceSettings.fromJson(
+          Map<String, dynamic>.from(jsonDecode(serviceData) as Map),
+        );
+      }
+    } catch (_) {
+      announcements = [];
+      services = const ServiceSettings();
+    }
     try {
       showcases = (jsonDecode(prefs.getString('showcases') ?? '[]') as List)
           .map(
@@ -178,6 +283,26 @@ class AppState extends ChangeNotifier {
     await prefs.setBool('signedIn', true);
     name = fullName.trim();
     email = address.trim();
+    stage = AuthStage.app;
+    notifyListeners();
+  }
+
+  /// Starts a presentation account without a password or remote service.
+  /// This keeps the resident and management demos easy to show while all
+  /// information remains in this device's local frontend storage.
+  Future<void> enterDemo({required bool official}) async {
+    final demoName = official ? 'Barangay Official' : 'Resident';
+    final demoEmail = official
+        ? 'official@pisaan.local'
+        : 'resident@pisaan.local';
+    await prefs.setString('name', demoName);
+    await prefs.setString('email', demoEmail);
+    await prefs.setBool('welcomed', true);
+    await prefs.setBool('signedIn', true);
+    await prefs.setBool('isOfficial', official);
+    name = demoName;
+    email = demoEmail;
+    isOfficial = official;
     stage = AuthStage.app;
     notifyListeners();
   }
@@ -239,6 +364,77 @@ class AppState extends ChangeNotifier {
       throw StateError('Could not save showcase.');
     }
     showcases = next;
+    notifyListeners();
+  }
+
+  Future<void> setOfficialMode(bool value) async {
+    if (!await prefs.setBool('isOfficial', value)) {
+      throw StateError('Could not save the role on this device.');
+    }
+    isOfficial = value;
+    notifyListeners();
+  }
+
+  Future<void> updateReport(
+    String id, {
+    required String status,
+    String? response,
+  }) async {
+    final trimmedResponse = response?.trim();
+    final next = reports.map((report) {
+      if (report.id != id) return report;
+      return report.copyWith(
+        status: status,
+        officialResponse: trimmedResponse == null || trimmedResponse.isEmpty
+            ? report.officialResponse
+            : trimmedResponse,
+      );
+    }).toList();
+    if (!await prefs.setString(
+      'reports',
+      jsonEncode(next.map((item) => item.toJson()).toList()),
+    )) {
+      throw StateError('Could not update the report on this device.');
+    }
+    reports = next;
+    notificationsRead = false;
+    await prefs.setBool('notificationsRead', false);
+    notifyListeners();
+  }
+
+  Future<void> addAnnouncement({
+    required String title,
+    required String body,
+    String category = 'BARANGAY NOTICE',
+  }) async {
+    if (title.trim().isEmpty || body.trim().isEmpty) {
+      throw ArgumentError('Add a title and message.');
+    }
+    final entry = AnnouncementEntry(
+      id: DateTime.now().microsecondsSinceEpoch.toString(),
+      title: title.trim(),
+      body: body.trim(),
+      date: formatDate(DateTime.now()),
+      category: category,
+    );
+    final next = [entry, ...announcements];
+    if (!await prefs.setString(
+      'announcements',
+      jsonEncode(next.map((item) => item.toJson()).toList()),
+    )) {
+      throw StateError('Could not publish the announcement on this device.');
+    }
+    announcements = next;
+    notificationsRead = false;
+    await prefs.setBool('notificationsRead', false);
+    notifyListeners();
+  }
+
+  Future<void> updateServices(ServiceSettings next) async {
+    if (!await prefs.setString('services', jsonEncode(next.toJson()))) {
+      throw StateError('Could not save service details on this device.');
+    }
+    services = next;
     notifyListeners();
   }
 

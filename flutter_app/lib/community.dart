@@ -338,6 +338,53 @@ class _UpdatesPageState extends State<UpdatesPage> {
       ),
       space(22),
       if (!showcase)
+        for (final entry in widget.state.announcements)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 18),
+            child: InkWell(
+              onTap: () => widget.open('announcement:${entry.id}'),
+              borderRadius: BorderRadius.circular(16),
+              child: Surface(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Wrap(
+                      spacing: 12,
+                      children: [
+                        Tag(entry.category),
+                        Text(
+                          entry.date,
+                          style: const TextStyle(fontSize: 10, color: muted),
+                        ),
+                      ],
+                    ),
+                    space(16),
+                    Text(
+                      entry.title,
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
+                    space(10),
+                    Text(
+                      entry.body,
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: muted,
+                        fontSize: 12,
+                        height: 1.6,
+                      ),
+                    ),
+                    space(16),
+                    const Text(
+                      'Read announcement →',
+                      style: TextStyle(color: green, fontSize: 11),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+      if (!showcase)
         for (final i in [2, 3, 4, 5, 7])
           Padding(
             padding: const EdgeInsets.only(bottom: 18),
@@ -561,6 +608,39 @@ class PostPage extends StatelessWidget {
   }
 }
 
+class AnnouncementDetailPage extends StatelessWidget {
+  final AnnouncementEntry entry;
+  final VoidCallback back;
+  const AnnouncementDetailPage({
+    super.key,
+    required this.entry,
+    required this.back,
+  });
+  @override
+  Widget build(BuildContext context) => PageBody(
+    children: [
+      PageHeading('Announcement', back: back),
+      Surface(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Tag(entry.category),
+            space(18),
+            Text(entry.title, style: Theme.of(context).textTheme.titleLarge),
+            space(10),
+            Text(
+              entry.date,
+              style: const TextStyle(color: muted, fontSize: 11),
+            ),
+            space(24),
+            Text(entry.body, style: const TextStyle(fontSize: 13, height: 1.8)),
+          ],
+        ),
+      ),
+    ],
+  );
+}
+
 class CommunityMap extends StatelessWidget {
   const CommunityMap({super.key});
   @override
@@ -652,7 +732,8 @@ class CommunityMap extends StatelessWidget {
 
 class CollectionPage extends StatelessWidget {
   final OpenPage open;
-  const CollectionPage({super.key, required this.open});
+  final AppState state;
+  const CollectionPage({super.key, required this.open, required this.state});
   @override
   Widget build(BuildContext context) => PageBody(
     children: [
@@ -676,10 +757,10 @@ class CollectionPage extends StatelessWidget {
             const Tag('WEEKLY COLLECTION'),
             space(20),
             for (final item in [
-              ('Collection day', 'Monday'),
-              ('Collection time', '8:00 AM'),
-              ('Service area', 'Upper Pisaan'),
-              ('Update window', '11:00 AM'),
+              ('Collection day', state.services.collectionDay),
+              ('Collection time', state.services.collectionTime),
+              ('Service area', state.services.serviceArea),
+              ('Update window', state.services.updateWindow),
             ])
               Padding(
                 padding: const EdgeInsets.only(bottom: 18),
@@ -714,9 +795,8 @@ class CollectionPage extends StatelessWidget {
       space(17),
       MenuCard(
         icon: Icons.location_on_outlined,
-        title: 'Community drop-off point',
-        subtitle:
-            'Location details await barangay confirmation.\nView details →',
+        title: state.services.dropoffName,
+        subtitle: '${state.services.dropoffLandmark}\nView details →',
         onTap: () => open('dropoff'),
       ),
       space(12),
@@ -730,7 +810,8 @@ class CollectionPage extends StatelessWidget {
 
 class DropoffPage extends StatelessWidget {
   final VoidCallback back;
-  const DropoffPage({super.key, required this.back});
+  final AppState state;
+  const DropoffPage({super.key, required this.back, required this.state});
   @override
   Widget build(BuildContext context) => PageBody(
     children: [
@@ -742,15 +823,15 @@ class DropoffPage extends StatelessWidget {
             const Tag('DROP-OFF LOCATION'),
             space(20),
             Text(
-              'Community drop-off point',
+              state.services.dropoffName,
               style: Theme.of(context).textTheme.titleLarge,
             ),
             space(22),
             const CommunityMap(),
             space(25),
-            detail('Address / landmark', 'Purok 3 · Lower Pisaan'),
-            detail('Accepted waste', 'Plastic bottles · clean and dry'),
-            detail('Operating hours', '8:00 AM – 11:00 AM'),
+            detail('Address / landmark', state.services.dropoffLandmark),
+            detail('Accepted waste', state.services.acceptedWaste),
+            detail('Operating hours', state.services.operatingHours),
             const Notice(
               'Bring clean, dry plastic bottles and keep different waste types separated.',
             ),

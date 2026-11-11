@@ -38,6 +38,22 @@ void main() {
     expect(find.text('Collection'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
+  testWidgets('official demo opens the management role', (tester) async {
+    await loadApp(tester);
+    await tester.ensureVisible(find.text('Official demo'));
+    await tester.tap(find.text('Official demo'));
+    await tester.pumpAndSettle();
+    await tester.tap(
+      find.descendant(
+        of: find.byType(NavigationBar),
+        matching: find.text('Profile'),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('Barangay Official'), findsOneWidget);
+    expect(find.text('Barangay Management'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
   testWidgets('all main screens fit a narrow phone without layout exceptions', (
     tester,
   ) async {
@@ -143,7 +159,7 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(submit);
       await tester.pumpAndSettle();
-      expect(find.text('Report saved\nsuccessfully!'), findsOneWidget);
+      expect(find.text('Report sent\nsuccessfully!'), findsOneWidget);
       expect(state.reports.first.location, 'Near the sample store');
       expect(state.reports.first.id, 'LP-001');
       expect(tester.takeException(), isNull);
@@ -199,7 +215,7 @@ void main() {
       expect(find.text('Saving…'), findsOneWidget);
       state.gate.complete();
       await tester.pumpAndSettle();
-      expect(find.text('Report saved\nsuccessfully!'), findsOneWidget);
+      expect(find.text('Report sent\nsuccessfully!'), findsOneWidget);
       expect(state.reports.length, 1);
     },
   );
