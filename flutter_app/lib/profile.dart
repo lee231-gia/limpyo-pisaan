@@ -169,6 +169,7 @@ class GuidePage extends StatelessWidget {
           ],
         ),
       ),
+      const SectionTitle('Sort your waste'),
       for (final item in [
         (
           Icons.layers_outlined,
@@ -202,7 +203,7 @@ class GuidePage extends StatelessWidget {
         ),
       ])
         Padding(
-          padding: const EdgeInsets.only(bottom: 14),
+          padding: const EdgeInsets.only(bottom: 12),
           child: Surface(
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -220,7 +221,7 @@ class GuidePage extends StatelessWidget {
                           fontSize: 15,
                         ),
                       ),
-                      space(10),
+                      space(8),
                       Text(
                         item.$3,
                         style: const TextStyle(
@@ -229,9 +230,9 @@ class GuidePage extends StatelessWidget {
                           height: 1.8,
                         ),
                       ),
-                      space(16),
+                      space(12),
                       const Divider(),
-                      space(9),
+                      space(8),
                       Text(
                         item.$4,
                         style: const TextStyle(
@@ -283,22 +284,22 @@ class GuidePage extends StatelessWidget {
       ],
       const SectionTitle('Everyday care, close to home'),
       PhotoCard(communityPhotos[7]),
-      space(12),
+      space(10),
       const Notice(
         'Keep reusable bottles together and separate from residual waste.',
         icon: Icons.recycling_outlined,
       ),
-      space(22),
+      space(18),
       PhotoCard(communityPhotos[6]),
-      space(12),
+      space(10),
       const Notice('Keep wrappers and household waste out of drains.'),
-      space(22),
+      space(18),
       PhotoCard(communityPhotos[4]),
-      space(12),
+      space(10),
       const Notice(
         'Never burn household waste. Separate and contain waste for proper disposal.',
       ),
-      space(18),
+      space(14),
       const Notice(
         'Do not pour chemicals, oil, or paint into soil or drainage. Keep sharp objects in a rigid container and ask the barangay office about safe disposal.',
         icon: Icons.warning_amber_outlined,
