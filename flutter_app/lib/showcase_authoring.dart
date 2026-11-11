@@ -61,6 +61,27 @@ class _AddShowcasePageState extends State<AddShowcasePage> {
   Future<void> save() async {
     if (saving || busy || !form.currentState!.validate()) return;
     FocusScope.of(context).unfocus();
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        icon: const Icon(Icons.publish_outlined, color: green),
+        title: const Text('Publish showcase?'),
+        content: const Text(
+          'Your story will be added to the Community Showcase on this device.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Keep editing'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Publish'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
     setState(() => saving = true);
     try {
       await widget.state.addShowcase(title.text, story.text, photo);

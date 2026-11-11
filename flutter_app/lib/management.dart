@@ -3,6 +3,51 @@ import 'community.dart';
 import 'state.dart';
 import 'ui.dart';
 
+Future<bool> confirmApply(
+  BuildContext context, {
+  required String title,
+  required String message,
+  required String action,
+}) async =>
+    await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        icon: const Icon(Icons.help_outline, color: green),
+        title: Text(title),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(action),
+          ),
+        ],
+      ),
+    ) ??
+    false;
+
+Future<void> showApplied(
+  BuildContext context, {
+  required String title,
+  required String message,
+}) => showDialog<void>(
+  context: context,
+  builder: (context) => AlertDialog(
+    icon: const Icon(Icons.check_circle_outline, color: green),
+    title: Text(title),
+    content: Text(message),
+    actions: [
+      FilledButton(
+        onPressed: () => Navigator.pop(context),
+        child: const Text('Done'),
+      ),
+    ],
+  ),
+);
+
 class ManagementPage extends StatelessWidget {
   final AppState state;
   final OpenPage open;
@@ -249,6 +294,15 @@ class _ManageReportPageState extends State<ManageReportPage> {
 
   Future<void> save({bool publish = false}) async {
     if (saving) return;
+    final confirmed = await confirmApply(
+      context,
+      title: publish ? 'Publish this update?' : 'Save this report update?',
+      message: publish
+          ? 'The status and resident response will be saved, and a community notice will be posted.'
+          : 'The status and resident response will be visible in this report on this device.',
+      action: publish ? 'Save and publish' : 'Save update',
+    );
+    if (!confirmed || !mounted) return;
     setState(() => saving = true);
     try {
       await widget.state.updateReport(
@@ -265,23 +319,12 @@ class _ManageReportPageState extends State<ManageReportPage> {
         );
       }
       if (mounted) {
-        await showDialog<void>(
-          context: context,
-          builder: (context) => AlertDialog(
-            icon: const Icon(Icons.check_circle_outline, color: green),
-            title: Text(publish ? 'Update published' : 'Report update saved'),
-            content: Text(
-              publish
-                  ? 'The resident response was saved and a community notice was posted.'
-                  : 'The report status and resident response are now saved.',
-            ),
-            actions: [
-              FilledButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Back to inbox'),
-              ),
-            ],
-          ),
+        await showApplied(
+          context,
+          title: publish ? 'Update published' : 'Report update saved',
+          message: publish
+              ? 'The resident response was saved and a community notice was posted.'
+              : 'The report status and resident response are now saved.',
         );
         if (context.mounted) widget.back();
       }
@@ -384,6 +427,14 @@ class _ManageAnnouncementsPageState extends State<ManageAnnouncementsPage> {
 
   Future<void> publish() async {
     if (saving || !form.currentState!.validate()) return;
+    final confirmed = await confirmApply(
+      context,
+      title: 'Publish announcement?',
+      message:
+          'Residents will be able to read this notice in Community Updates on this device.',
+      action: 'Publish',
+    );
+    if (!confirmed || !mounted) return;
     setState(() => saving = true);
     try {
       await widget.state.addAnnouncement(
@@ -393,7 +444,15 @@ class _ManageAnnouncementsPageState extends State<ManageAnnouncementsPage> {
       );
       title.clear();
       body.clear();
-      if (mounted) setState(() => published = true);
+      if (mounted) {
+        setState(() => published = true);
+        await showApplied(
+          context,
+          title: 'Announcement published',
+          message:
+              'Residents can now read this notice in Community Updates on this device.',
+        );
+      }
     } catch (_) {
       if (mounted) showMessage(context, 'Could not publish the announcement.');
     } finally {
@@ -520,12 +579,28 @@ class _ManageGuidesPageState extends State<ManageGuidesPage> {
 
   Future<void> publish() async {
     if (saving || !form.currentState!.validate()) return;
+    final confirmed = await confirmApply(
+      context,
+      title: 'Publish guide tip?',
+      message:
+          'Residents will be able to read this tip in the Waste Guide on this device.',
+      action: 'Publish tip',
+    );
+    if (!confirmed || !mounted) return;
     setState(() => saving = true);
     try {
       await widget.state.addGuide(title: title.text, body: body.text);
       title.clear();
       body.clear();
-      if (mounted) setState(() => published = true);
+      if (mounted) {
+        setState(() => published = true);
+        await showApplied(
+          context,
+          title: 'Guide tip published',
+          message:
+              'Residents can now read this tip in the Waste Guide on this device.',
+        );
+      }
     } catch (_) {
       if (mounted) showMessage(context, 'Could not publish the guide tip.');
     } finally {
@@ -666,6 +741,14 @@ class _ManageServicesPageState extends State<ManageServicesPage> {
 
   Future<void> save() async {
     if (saving || !form.currentState!.validate()) return;
+    final confirmed = await confirmApply(
+      context,
+      title: 'Apply service details?',
+      message:
+          'The collection schedule, drop-off information, and map pin will replace the current details residents see on this device.',
+      action: 'Apply changes',
+    );
+    if (!confirmed || !mounted) return;
     setState(() => saving = true);
     try {
       await widget.state.updateServices(
@@ -682,7 +765,15 @@ class _ManageServicesPageState extends State<ManageServicesPage> {
           dropoffPinY: pinY,
         ),
       );
-      if (mounted) setState(() => saved = true);
+      if (mounted) {
+        setState(() => saved = true);
+        await showApplied(
+          context,
+          title: 'Service details applied',
+          message:
+              'The collection details and drop-off pin are now updated for residents on this device.',
+        );
+      }
     } catch (_) {
       if (mounted) showMessage(context, 'Could not save service details.');
     } finally {

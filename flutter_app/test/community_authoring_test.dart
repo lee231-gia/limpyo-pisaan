@@ -50,6 +50,8 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('Save showcase'));
     await tester.pumpAndSettle();
+    await tester.tap(find.text('Publish'));
+    await tester.pumpAndSettle();
     expect(find.text('Our clean corner'), findsOneWidget);
     await tester.tap(find.text('Our clean corner'));
     await tester.pumpAndSettle();
