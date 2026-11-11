@@ -241,88 +241,94 @@ class _AppShellState extends State<AppShell> {
       ),
       bottomNavigationBar: page == 'success'
           ? null
-          : widget.state.isOfficial
-          ? NavigationBar(
-              selectedIndex: selected,
-              onDestinationSelected: reportSaving
-                  ? null
-                  : (index) => tab(
-                      [
-                        'home',
-                        'management-reports',
-                        'manage-announcements',
-                        'manage-services',
-                        'profile',
-                      ][index],
+          : Container(
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                border: Border(top: BorderSide(color: line, width: 1.5)),
+              ),
+              child: widget.state.isOfficial
+                  ? NavigationBar(
+                      selectedIndex: selected,
+                      onDestinationSelected: reportSaving
+                          ? null
+                          : (index) => tab(
+                              [
+                                'home',
+                                'management-reports',
+                                'manage-announcements',
+                                'manage-services',
+                                'profile',
+                              ][index],
+                            ),
+                      destinations: const [
+                        NavigationDestination(
+                          icon: Icon(Icons.dashboard_outlined),
+                          selectedIcon: Icon(Icons.dashboard),
+                          label: 'Dashboard',
+                        ),
+                        NavigationDestination(
+                          icon: Icon(Icons.inbox_outlined),
+                          selectedIcon: Icon(Icons.inbox),
+                          label: 'Reports',
+                        ),
+                        NavigationDestination(
+                          icon: Icon(Icons.campaign_outlined),
+                          selectedIcon: Icon(Icons.campaign),
+                          label: 'Notices',
+                        ),
+                        NavigationDestination(
+                          icon: Icon(Icons.location_on_outlined),
+                          selectedIcon: Icon(Icons.location_on),
+                          label: 'Services',
+                        ),
+                        NavigationDestination(
+                          icon: Icon(Icons.account_circle_outlined),
+                          selectedIcon: Icon(Icons.account_circle),
+                          label: 'Profile',
+                        ),
+                      ],
+                    )
+                  : NavigationBar(
+                      selectedIndex: selected,
+                      onDestinationSelected: reportSaving
+                          ? null
+                          : (index) => tab(
+                              [
+                                'home',
+                                'updates',
+                                'collection',
+                                'report',
+                                'profile',
+                              ][index],
+                            ),
+                      destinations: const [
+                        NavigationDestination(
+                          icon: Icon(Icons.home_outlined),
+                          selectedIcon: Icon(Icons.home),
+                          label: 'Home',
+                        ),
+                        NavigationDestination(
+                          icon: Icon(Icons.feed_outlined),
+                          selectedIcon: Icon(Icons.feed),
+                          label: 'Updates',
+                        ),
+                        NavigationDestination(
+                          icon: Icon(Icons.local_shipping_outlined),
+                          selectedIcon: Icon(Icons.local_shipping),
+                          label: 'Collection',
+                        ),
+                        NavigationDestination(
+                          icon: Icon(Icons.edit_note_outlined),
+                          selectedIcon: Icon(Icons.edit_note),
+                          label: 'Report',
+                        ),
+                        NavigationDestination(
+                          icon: Icon(Icons.person_outline),
+                          selectedIcon: Icon(Icons.person),
+                          label: 'Profile',
+                        ),
+                      ],
                     ),
-              destinations: const [
-                NavigationDestination(
-                  icon: Icon(Icons.dashboard_outlined),
-                  selectedIcon: Icon(Icons.dashboard),
-                  label: 'Dashboard',
-                ),
-                NavigationDestination(
-                  icon: Icon(Icons.inbox_outlined),
-                  selectedIcon: Icon(Icons.inbox),
-                  label: 'Reports',
-                ),
-                NavigationDestination(
-                  icon: Icon(Icons.campaign_outlined),
-                  selectedIcon: Icon(Icons.campaign),
-                  label: 'Notices',
-                ),
-                NavigationDestination(
-                  icon: Icon(Icons.location_on_outlined),
-                  selectedIcon: Icon(Icons.location_on),
-                  label: 'Services',
-                ),
-                NavigationDestination(
-                  icon: Icon(Icons.account_circle_outlined),
-                  selectedIcon: Icon(Icons.account_circle),
-                  label: 'Profile',
-                ),
-              ],
-            )
-          : NavigationBar(
-              selectedIndex: selected,
-              onDestinationSelected: reportSaving
-                  ? null
-                  : (index) => tab(
-                      [
-                        'home',
-                        'updates',
-                        'collection',
-                        'report',
-                        'profile',
-                      ][index],
-                    ),
-              destinations: const [
-                NavigationDestination(
-                  icon: Icon(Icons.home_outlined),
-                  selectedIcon: Icon(Icons.home),
-                  label: 'Home',
-                ),
-                NavigationDestination(
-                  icon: Icon(Icons.feed_outlined),
-                  selectedIcon: Icon(Icons.feed),
-                  label: 'Updates',
-                ),
-                NavigationDestination(
-                  icon: Icon(Icons.local_shipping_outlined),
-                  selectedIcon: Icon(Icons.local_shipping),
-                  label: 'Collection',
-                ),
-                NavigationDestination(
-                  icon: Icon(Icons.edit_note_outlined),
-                  selectedIcon: Icon(Icons.edit_note),
-                  label: 'Report',
-                ),
-                NavigationDestination(
-                  icon: Icon(Icons.person_outline),
-                  selectedIcon: Icon(Icons.person),
-                  label: 'Profile',
-                ),
-              ],
             ),
     ),
   );
