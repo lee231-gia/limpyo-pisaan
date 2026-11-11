@@ -418,6 +418,27 @@ class _ReviewPageState extends State<ReviewPage> {
   bool saving = false;
   Future<void> submit() async {
     if (saving) return;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        icon: const Icon(Icons.send_outlined, color: green),
+        title: const Text('Send this report?'),
+        content: const Text(
+          'Review the details above. Once sent, the report will appear in the Barangay Management inbox on this device.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Keep editing'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Send report'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
     setState(() => saving = true);
     widget.onSaving(true);
     try {

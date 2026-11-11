@@ -55,7 +55,7 @@ For an APK built by GitHub, open **Actions → Build Flutter Android APK → Run
 
 Welcome, normal login, Resident demo and Barangay Official demo access, registration validation, account help, home, announcement/showcase tabs and details, collection notice/sample schedule/drop-off map, report issue picker (including a custom issue option), required-field errors, landmark suggestions, camera/gallery photo attachment, review/edit, local submission and unique reference, report filters and history, profile, waste guide, read-state notifications, about, and logout confirmation.
 
-The Official demo includes Barangay Management: a report inbox with responses and status updates, announcements, community showcase access, and editable collection and drop-off details. A management response can be saved for the reporter or saved together with a community-action announcement.
+The Official demo opens a separate Barangay Management workspace with its own Dashboard, Reports, Notices, Services, and Profile tabs. It includes a report inbox with responses and status updates, announcements, community showcase access, richer waste-guide tips, editable collection and drop-off details, and a tappable local map for placing the drop-off pin. A management response can be saved for the reporter or saved together with a community-action announcement.
 
 The interface uses native Flutter Material widgets, the green-and-cream Phase 5 palette, labeled bottom navigation, bundled local artwork, scrollable forms, system back navigation and portrait orientation.
 

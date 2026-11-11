@@ -89,66 +89,17 @@ class ProfilePage extends StatelessWidget {
         style: TextStyle(color: muted, fontSize: 10),
       ),
       space(32),
-      MenuCard(
-        icon: Icons.assignment_outlined,
-        title: 'My Reports',
-        subtitle: 'Your reports and status history',
-        onTap: () => open('reports'),
-      ),
-      MenuCard(
-        icon: Icons.admin_panel_settings_outlined,
-        title: state.isOfficial
-            ? 'Barangay Management'
-            : 'Switch to Barangay Management',
-        subtitle: state.isOfficial
-            ? 'Review reports, publish updates, and manage services'
-            : 'Use this device as an official management view',
-        onTap: () async {
-          if (!state.isOfficial) {
-            final approved = await showDialog<bool>(
-              context: context,
-              builder: (context) => AlertDialog(
-                title: const Text('Use Barangay Management?'),
-                content: const Text(
-                  'This enables the official tools on this device. Reports, responses, announcements, and service details remain local because this app has no backend.',
-                ),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(context, false),
-                    child: const Text('Cancel'),
-                  ),
-                  FilledButton(
-                    onPressed: () => Navigator.pop(context, true),
-                    child: const Text('Continue'),
-                  ),
-                ],
-              ),
-            );
-            if (approved != true) return;
-            try {
-              await state.setOfficialMode(true);
-            } catch (_) {
-              if (context.mounted)
-                showMessage(context, 'Could not switch to management mode.');
-              return;
-            }
-          }
-          if (context.mounted) open('management');
-        },
-      ),
-      if (state.isOfficial)
+      if (!state.isOfficial)
         MenuCard(
-          icon: Icons.person_outline,
-          title: 'Use Resident View',
-          subtitle: 'Return this device to the resident experience',
-          onTap: () async {
-            try {
-              await state.setOfficialMode(false);
-            } catch (_) {
-              if (context.mounted)
-                showMessage(context, 'Could not switch to resident view.');
-            }
-          },
+          icon: Icons.assignment_outlined,
+          title: 'My Reports',
+          subtitle: 'Your reports and status history',
+          onTap: () => open('reports'),
+        )
+      else
+        const Notice(
+          'You are using the Barangay Official workspace. Use the dashboard tabs to review reports, publish notices, and manage service information.',
+          icon: Icons.verified_user_outlined,
         ),
       MenuCard(
         icon: Icons.menu_book_outlined,
@@ -177,7 +128,7 @@ class ProfilePage extends StatelessWidget {
       ),
       space(18),
       const Text(
-        'Limpyo Pisaan · Community waste information\nVersion 1.4 · Barangay Pisaan',
+        'Limpyo Pisaan · Community waste information\nVersion 1.5 · Barangay Pisaan',
         textAlign: TextAlign.center,
         style: TextStyle(color: muted, fontSize: 10, height: 1.8),
       ),
@@ -186,8 +137,9 @@ class ProfilePage extends StatelessWidget {
 }
 
 class GuidePage extends StatelessWidget {
+  final AppState state;
   final VoidCallback back;
-  const GuidePage({super.key, required this.back});
+  const GuidePage({super.key, required this.state, required this.back});
   @override
   Widget build(BuildContext context) => PageBody(
     children: [
@@ -199,6 +151,23 @@ class GuidePage extends StatelessWidget {
       const Notice(
         'Sort waste at home and use the disposal options provided in your community.',
         icon: Icons.menu_book_outlined,
+      ),
+      const SectionTitle('Before collection'),
+      const Surface(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'A simple five-minute routine',
+              style: TextStyle(fontWeight: FontWeight.w700),
+            ),
+            SizedBox(height: 14),
+            Text(
+              '1. Keep food scraps and leaves in a separate container.\n2. Rinse bottles, cans, and jars; let them dry.\n3. Put wrappers and sachets in a secure residual-waste bag.\n4. Tie bags before collection and keep them off the road or drain.\n5. Check collection updates before placing waste outside.',
+              style: TextStyle(color: muted, fontSize: 12, height: 1.8),
+            ),
+          ],
+        ),
       ),
       for (final item in [
         (
@@ -278,6 +247,40 @@ class GuidePage extends StatelessWidget {
             ),
           ),
         ),
+      if (state.guides.isNotEmpty) ...[
+        const SectionTitle('Barangay guide updates'),
+        for (final guide in state.guides)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 14),
+            child: Surface(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Tag('GUIDE TIP'),
+                  space(13),
+                  Text(
+                    guide.title,
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  space(9),
+                  Text(
+                    guide.body,
+                    style: const TextStyle(
+                      color: muted,
+                      fontSize: 12,
+                      height: 1.7,
+                    ),
+                  ),
+                  space(12),
+                  Text(
+                    guide.date,
+                    style: const TextStyle(color: muted, fontSize: 10),
+                  ),
+                ],
+              ),
+            ),
+          ),
+      ],
       const SectionTitle('Everyday care, close to home'),
       PhotoCard(communityPhotos[7]),
       space(12),
@@ -294,6 +297,11 @@ class GuidePage extends StatelessWidget {
       space(12),
       const Notice(
         'Never burn household waste. Separate and contain waste for proper disposal.',
+      ),
+      space(18),
+      const Notice(
+        'Do not pour chemicals, oil, or paint into soil or drainage. Keep sharp objects in a rigid container and ask the barangay office about safe disposal.',
+        icon: Icons.warning_amber_outlined,
       ),
     ],
   );

@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
+import 'community.dart';
 import 'state.dart';
 import 'ui.dart';
 
 class ManagementPage extends StatelessWidget {
   final AppState state;
   final OpenPage open;
-  final VoidCallback back;
+  final VoidCallback? back;
   const ManagementPage({
     super.key,
     required this.state,
     required this.open,
-    required this.back,
+    this.back,
   });
 
   @override
@@ -70,6 +71,12 @@ class ManagementPage extends StatelessWidget {
           title: 'Community showcase',
           subtitle: 'Post good examples, clean-up progress, or concerns',
           onTap: () => open('updates'),
+        ),
+        MenuCard(
+          icon: Icons.menu_book_outlined,
+          title: 'Waste guide',
+          subtitle: 'Add practical disposal tips for residents',
+          onTap: () => open('manage-guides'),
         ),
         MenuCard(
           icon: Icons.location_on_outlined,
@@ -258,17 +265,30 @@ class _ManageReportPageState extends State<ManageReportPage> {
         );
       }
       if (mounted) {
-        showMessage(
-          context,
-          publish
-              ? 'Report updated and announcement published.'
-              : 'Management update saved.',
+        await showDialog<void>(
+          context: context,
+          builder: (context) => AlertDialog(
+            icon: const Icon(Icons.check_circle_outline, color: green),
+            title: Text(publish ? 'Update published' : 'Report update saved'),
+            content: Text(
+              publish
+                  ? 'The resident response was saved and a community notice was posted.'
+                  : 'The report status and resident response are now saved.',
+            ),
+            actions: [
+              FilledButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Back to inbox'),
+              ),
+            ],
+          ),
         );
-        widget.back();
+        if (context.mounted) widget.back();
       }
     } catch (_) {
-      if (mounted)
+      if (mounted) {
         showMessage(context, 'Could not save the management update.');
+      }
     } finally {
       if (mounted) setState(() => saving = false);
     }
@@ -301,7 +321,7 @@ class _ManageReportPageState extends State<ManageReportPage> {
       ),
       space(8),
       DropdownButtonFormField<String>(
-        value: status,
+        initialValue: status,
         items: ['Pending', 'In Progress', 'Resolved']
             .map((item) => DropdownMenuItem(value: item, child: Text(item)))
             .toList(),
@@ -354,6 +374,7 @@ class _ManageAnnouncementsPageState extends State<ManageAnnouncementsPage> {
   final title = TextEditingController(), body = TextEditingController();
   String category = 'BARANGAY NOTICE';
   bool saving = false;
+  bool published = false;
   @override
   void dispose() {
     title.dispose();
@@ -372,7 +393,7 @@ class _ManageAnnouncementsPageState extends State<ManageAnnouncementsPage> {
       );
       title.clear();
       body.clear();
-      if (mounted) showMessage(context, 'Announcement published.');
+      if (mounted) setState(() => published = true);
     } catch (_) {
       if (mounted) showMessage(context, 'Could not publish the announcement.');
     } finally {
@@ -400,7 +421,7 @@ class _ManageAnnouncementsPageState extends State<ManageAnnouncementsPage> {
               ),
               space(16),
               DropdownButtonFormField<String>(
-                value: category,
+                initialValue: category,
                 items:
                     ['BARANGAY NOTICE', 'COMMUNITY ACTION', 'COLLECTION UPDATE']
                         .map(
@@ -441,6 +462,13 @@ class _ManageAnnouncementsPageState extends State<ManageAnnouncementsPage> {
           ),
         ),
       ),
+      if (published) ...[
+        space(16),
+        const Notice(
+          'Announcement published. Residents can now read it in Community Updates on this device.',
+          icon: Icons.check_circle_outline,
+        ),
+      ],
       if (widget.state.announcements.isNotEmpty)
         const SectionTitle('Published on this device'),
       for (final entry in widget.state.announcements)
@@ -469,6 +497,129 @@ class _ManageAnnouncementsPageState extends State<ManageAnnouncementsPage> {
   );
 }
 
+class ManageGuidesPage extends StatefulWidget {
+  final AppState state;
+  final VoidCallback back;
+  const ManageGuidesPage({super.key, required this.state, required this.back});
+  @override
+  State<ManageGuidesPage> createState() => _ManageGuidesPageState();
+}
+
+class _ManageGuidesPageState extends State<ManageGuidesPage> {
+  final form = GlobalKey<FormState>();
+  final title = TextEditingController();
+  final body = TextEditingController();
+  bool saving = false;
+  bool published = false;
+  @override
+  void dispose() {
+    title.dispose();
+    body.dispose();
+    super.dispose();
+  }
+
+  Future<void> publish() async {
+    if (saving || !form.currentState!.validate()) return;
+    setState(() => saving = true);
+    try {
+      await widget.state.addGuide(title: title.text, body: body.text);
+      title.clear();
+      body.clear();
+      if (mounted) setState(() => published = true);
+    } catch (_) {
+      if (mounted) showMessage(context, 'Could not publish the guide tip.');
+    } finally {
+      if (mounted) setState(() => saving = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) => PageBody(
+    children: [
+      PageHeading(
+        'Waste guide',
+        subtitle: 'Add clear, practical tips for residents.',
+        back: widget.back,
+      ),
+      Surface(
+        child: Form(
+          key: form,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'New guide tip',
+                style: TextStyle(fontWeight: FontWeight.w700),
+              ),
+              space(16),
+              TextFormField(
+                controller: title,
+                enabled: !saving,
+                maxLength: 120,
+                decoration: const InputDecoration(
+                  labelText: 'Tip title *',
+                  hintText: 'e.g. Keep recyclables clean and dry',
+                ),
+                validator: (value) =>
+                    value?.trim().isNotEmpty == true ? null : 'Enter a title.',
+              ),
+              space(12),
+              TextFormField(
+                controller: body,
+                enabled: !saving,
+                maxLines: 5,
+                maxLength: 700,
+                decoration: const InputDecoration(
+                  labelText: 'Guide details *',
+                  hintText:
+                      'Explain what residents should do and why it helps.',
+                ),
+                validator: (value) => value?.trim().isNotEmpty == true
+                    ? null
+                    : 'Enter the guide details.',
+              ),
+              primaryButton(
+                saving ? 'Publishing…' : 'Publish guide tip',
+                saving ? null : publish,
+                icon: Icons.menu_book_outlined,
+              ),
+            ],
+          ),
+        ),
+      ),
+      if (published) ...[
+        space(16),
+        const Notice(
+          'Guide tip published. Residents can now read it in the Waste Guide on this device.',
+          icon: Icons.check_circle_outline,
+        ),
+      ],
+      if (widget.state.guides.isNotEmpty)
+        const SectionTitle('Published guide tips'),
+      for (final guide in widget.state.guides)
+        Padding(
+          padding: const EdgeInsets.only(bottom: 12),
+          child: Surface(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  guide.title,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                space(8),
+                Text(
+                  guide.date,
+                  style: const TextStyle(color: muted, fontSize: 10),
+                ),
+              ],
+            ),
+          ),
+        ),
+    ],
+  );
+}
+
 class ManageServicesPage extends StatefulWidget {
   final AppState state;
   final VoidCallback back;
@@ -484,11 +635,15 @@ class ManageServicesPage extends StatefulWidget {
 class _ManageServicesPageState extends State<ManageServicesPage> {
   final form = GlobalKey<FormState>();
   late final Map<String, TextEditingController> fields;
+  late double pinX, pinY;
   bool saving = false;
+  bool saved = false;
   @override
   void initState() {
     super.initState();
     final s = widget.state.services;
+    pinX = s.dropoffPinX;
+    pinY = s.dropoffPinY;
     fields = {
       'Collection day': TextEditingController(text: s.collectionDay),
       'Collection time': TextEditingController(text: s.collectionTime),
@@ -523,9 +678,11 @@ class _ManageServicesPageState extends State<ManageServicesPage> {
           dropoffLandmark: fields['Landmark']!.text.trim(),
           acceptedWaste: fields['Accepted waste']!.text.trim(),
           operatingHours: fields['Operating hours']!.text.trim(),
+          dropoffPinX: pinX,
+          dropoffPinY: pinY,
         ),
       );
-      if (mounted) showMessage(context, 'Service details updated.');
+      if (mounted) setState(() => saved = true);
     } catch (_) {
       if (mounted) showMessage(context, 'Could not save service details.');
     } finally {
@@ -555,6 +712,29 @@ class _ManageServicesPageState extends State<ManageServicesPage> {
             ])
               _field(label),
             const SectionTitle('Drop-off location'),
+            CommunityMap(
+              pinX: pinX,
+              pinY: pinY,
+              editable: true,
+              onPinChanged: (point) => setState(() {
+                pinX = point.dx;
+                pinY = point.dy;
+                saved = false;
+              }),
+            ),
+            space(10),
+            const Text(
+              'Tap the map to pinpoint the drop-off location residents will see.',
+              style: TextStyle(color: muted, fontSize: 11, height: 1.6),
+            ),
+            if (saved) ...[
+              space(16),
+              const Notice(
+                'Service details and the drop-off pin have been saved. Residents will see the updated information on this device.',
+                icon: Icons.check_circle_outline,
+              ),
+            ],
+            space(16),
             for (final label in [
               'Drop-off name',
               'Landmark',

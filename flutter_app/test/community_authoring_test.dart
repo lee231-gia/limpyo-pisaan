@@ -97,6 +97,8 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('Save Report'));
     await tester.pumpAndSettle();
+    await tester.tap(find.text('Send report'));
+    await tester.pumpAndSettle();
     expect(state.reports.single.type, 'Broken glass on pathway');
   });
 }

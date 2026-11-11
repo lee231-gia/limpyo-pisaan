@@ -109,8 +109,16 @@ void main() {
       body: 'Please keep the canal clear before the next rainfall.',
       category: 'COMMUNITY ACTION',
     );
+    await state.addGuide(
+      title: 'Rinse before recycling',
+      body: 'Wash bottles and cans, then let them dry before storing them.',
+    );
     await state.updateServices(
-      const ServiceSettings(dropoffName: 'Covered court drop-off point'),
+      const ServiceSettings(
+        dropoffName: 'Covered court drop-off point',
+        dropoffPinX: .72,
+        dropoffPinY: .61,
+      ),
     );
 
     final reloaded = AppState(prefs);
@@ -118,6 +126,9 @@ void main() {
     expect(reloaded.reports.single.status, 'In Progress');
     expect(reloaded.reports.single.officialResponse, contains('inspect'));
     expect(reloaded.announcements.single.title, 'Drainage clean-up');
+    expect(reloaded.guides.single.title, 'Rinse before recycling');
     expect(reloaded.services.dropoffName, 'Covered court drop-off point');
+    expect(reloaded.services.dropoffPinX, .72);
+    expect(reloaded.services.dropoffPinY, .61);
   });
 }

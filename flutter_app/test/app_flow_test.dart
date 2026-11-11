@@ -51,6 +51,14 @@ void main() {
     );
     await tester.pumpAndSettle();
     expect(find.text('Barangay Official'), findsOneWidget);
+    expect(find.textContaining('Barangay Official workspace'), findsOneWidget);
+    await tester.tap(
+      find.descendant(
+        of: find.byType(NavigationBar),
+        matching: find.text('Dashboard'),
+      ),
+    );
+    await tester.pumpAndSettle();
     expect(find.text('Barangay Management'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
@@ -159,6 +167,8 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(submit);
       await tester.pumpAndSettle();
+      await tester.tap(find.text('Send report'));
+      await tester.pumpAndSettle();
       expect(find.text('Report sent\nsuccessfully!'), findsOneWidget);
       expect(state.reports.first.location, 'Near the sample store');
       expect(state.reports.first.id, 'LP-001');
@@ -203,6 +213,8 @@ void main() {
       );
       await tester.pumpAndSettle();
       await tester.tap(submit);
+      await tester.pump();
+      await tester.tap(find.text('Send report'));
       await tester.pump();
       expect(
         tester

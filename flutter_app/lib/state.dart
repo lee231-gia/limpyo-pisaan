@@ -67,9 +67,32 @@ class AnnouncementEntry {
   };
 }
 
+class GuideEntry {
+  final String id, title, body, date;
+  const GuideEntry({
+    required this.id,
+    required this.title,
+    required this.body,
+    required this.date,
+  });
+  factory GuideEntry.fromJson(Map<String, dynamic> json) => GuideEntry(
+    id: json['id'] as String,
+    title: json['title'] as String,
+    body: json['body'] as String,
+    date: json['date'] as String,
+  );
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'title': title,
+    'body': body,
+    'date': date,
+  };
+}
+
 class ServiceSettings {
   final String collectionDay, collectionTime, serviceArea, updateWindow;
   final String dropoffName, dropoffLandmark, acceptedWaste, operatingHours;
+  final double dropoffPinX, dropoffPinY;
   const ServiceSettings({
     this.collectionDay = 'Monday',
     this.collectionTime = '8:00 AM',
@@ -79,6 +102,8 @@ class ServiceSettings {
     this.dropoffLandmark = 'Purok 3 · Lower Pisaan',
     this.acceptedWaste = 'Plastic bottles · clean and dry',
     this.operatingHours = '8:00 AM – 11:00 AM',
+    this.dropoffPinX = .28,
+    this.dropoffPinY = .43,
   });
   factory ServiceSettings.fromJson(
     Map<String, dynamic> json,
@@ -93,6 +118,8 @@ class ServiceSettings {
     acceptedWaste:
         json['acceptedWaste'] as String? ?? 'Plastic bottles · clean and dry',
     operatingHours: json['operatingHours'] as String? ?? '8:00 AM – 11:00 AM',
+    dropoffPinX: (json['dropoffPinX'] as num?)?.toDouble() ?? .28,
+    dropoffPinY: (json['dropoffPinY'] as num?)?.toDouble() ?? .43,
   );
   Map<String, dynamic> toJson() => {
     'collectionDay': collectionDay,
@@ -103,6 +130,8 @@ class ServiceSettings {
     'dropoffLandmark': dropoffLandmark,
     'acceptedWaste': acceptedWaste,
     'operatingHours': operatingHours,
+    'dropoffPinX': dropoffPinX,
+    'dropoffPinY': dropoffPinY,
   };
 }
 
@@ -201,6 +230,7 @@ class AppState extends ChangeNotifier {
   late List<WasteReport> reports;
   List<ShowcaseEntry> showcases = [];
   List<AnnouncementEntry> announcements = [];
+  List<GuideEntry> guides = [];
   ServiceSettings services = const ServiceSettings();
   late bool isOfficial;
   late bool notificationsRead;
@@ -233,8 +263,15 @@ class AppState extends ChangeNotifier {
           Map<String, dynamic>.from(jsonDecode(serviceData) as Map),
         );
       }
+      guides = (jsonDecode(prefs.getString('guides') ?? '[]') as List)
+          .map(
+            (item) =>
+                GuideEntry.fromJson(Map<String, dynamic>.from(item as Map)),
+          )
+          .toList();
     } catch (_) {
       announcements = [];
+      guides = [];
       services = const ServiceSettings();
     }
     try {
@@ -427,6 +464,27 @@ class AppState extends ChangeNotifier {
     announcements = next;
     notificationsRead = false;
     await prefs.setBool('notificationsRead', false);
+    notifyListeners();
+  }
+
+  Future<void> addGuide({required String title, required String body}) async {
+    if (title.trim().isEmpty || body.trim().isEmpty) {
+      throw ArgumentError('Add a title and guide text.');
+    }
+    final entry = GuideEntry(
+      id: DateTime.now().microsecondsSinceEpoch.toString(),
+      title: title.trim(),
+      body: body.trim(),
+      date: formatDate(DateTime.now()),
+    );
+    final next = [entry, ...guides];
+    if (!await prefs.setString(
+      'guides',
+      jsonEncode(next.map((item) => item.toJson()).toList()),
+    )) {
+      throw StateError('Could not publish the guide tip on this device.');
+    }
+    guides = next;
     notifyListeners();
   }
 

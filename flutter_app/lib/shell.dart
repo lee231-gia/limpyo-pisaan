@@ -45,6 +45,15 @@ class _AppShellState extends State<AppShell> {
   }
 
   int get selected {
+    if (widget.state.isOfficial) {
+      if (page == 'management-reports' || page.startsWith('manage-report:')) {
+        return 1;
+      }
+      if (page == 'manage-announcements' || page == 'manage-guides') return 2;
+      if (page == 'manage-services') return 3;
+      if (['profile', 'guide', 'about'].contains(page)) return 4;
+      return 0;
+    }
     if (page.startsWith('post:') ||
         page.startsWith('show:') ||
         page == 'updates' ||
@@ -63,6 +72,7 @@ class _AppShellState extends State<AppShell> {
           'management',
           'management-reports',
           'manage-announcements',
+          'manage-guides',
           'manage-services',
         ].contains(page) ||
         page.startsWith('details:') ||
@@ -75,7 +85,9 @@ class _AppShellState extends State<AppShell> {
   Widget content() {
     switch (page) {
       case 'home':
-        return HomePage(state: widget.state, open: open);
+        return widget.state.isOfficial
+            ? ManagementPage(state: widget.state, open: open)
+            : HomePage(state: widget.state, open: open);
       case 'updates':
         return UpdatesPage(open: open, state: widget.state);
       case 'collection':
@@ -116,7 +128,7 @@ class _AppShellState extends State<AppShell> {
       case 'reports':
         return ReportsPage(state: widget.state, open: open, back: back);
       case 'guide':
-        return GuidePage(back: back);
+        return GuidePage(state: widget.state, back: back);
       case 'notifications':
         return NotificationsPage(state: widget.state, open: open, back: back);
       case 'about':
@@ -131,6 +143,8 @@ class _AppShellState extends State<AppShell> {
         );
       case 'manage-announcements':
         return ManageAnnouncementsPage(state: widget.state, back: back);
+      case 'manage-guides':
+        return ManageGuidesPage(state: widget.state, back: back);
       case 'manage-services':
         return ManageServicesPage(state: widget.state, back: back);
     }
@@ -227,6 +241,48 @@ class _AppShellState extends State<AppShell> {
       ),
       bottomNavigationBar: page == 'success'
           ? null
+          : widget.state.isOfficial
+          ? NavigationBar(
+              selectedIndex: selected,
+              onDestinationSelected: reportSaving
+                  ? null
+                  : (index) => tab(
+                      [
+                        'home',
+                        'management-reports',
+                        'manage-announcements',
+                        'manage-services',
+                        'profile',
+                      ][index],
+                    ),
+              destinations: const [
+                NavigationDestination(
+                  icon: Icon(Icons.dashboard_outlined),
+                  selectedIcon: Icon(Icons.dashboard),
+                  label: 'Dashboard',
+                ),
+                NavigationDestination(
+                  icon: Icon(Icons.inbox_outlined),
+                  selectedIcon: Icon(Icons.inbox),
+                  label: 'Reports',
+                ),
+                NavigationDestination(
+                  icon: Icon(Icons.campaign_outlined),
+                  selectedIcon: Icon(Icons.campaign),
+                  label: 'Notices',
+                ),
+                NavigationDestination(
+                  icon: Icon(Icons.location_on_outlined),
+                  selectedIcon: Icon(Icons.location_on),
+                  label: 'Services',
+                ),
+                NavigationDestination(
+                  icon: Icon(Icons.account_circle_outlined),
+                  selectedIcon: Icon(Icons.account_circle),
+                  label: 'Profile',
+                ),
+              ],
+            )
           : NavigationBar(
               selectedIndex: selected,
               onDestinationSelected: reportSaving
