@@ -4,7 +4,7 @@ $previewRepo = 'lee231-gia/limpyo-pisaan-preview'
 $checkout = Join-Path $projectRoot 'artifacts/browser-preview-publish'
 Push-Location (Join-Path $projectRoot 'flutter_app')
 try {
-    flutter build web --release --base-href /limpyo-pisaan-preview/ --no-web-resources-cdn
+    flutter build web --release --base-href /limpyo-pisaan-preview/ --no-web-resources-cdn --enable-experiment=dot-shorthands
     if ($LASTEXITCODE -ne 0) { throw 'Flutter web build failed.' }
 } finally { Pop-Location }
 if (-not (Test-Path -LiteralPath (Join-Path $checkout '.git'))) {
