@@ -30,8 +30,8 @@ void main() {
 
   testWidgets('demo login opens the five-tab native app', (tester) async {
     await loadApp(tester);
-    await tester.ensureVisible(find.text('Continue as guest →'));
-    await tester.tap(find.text('Continue as guest →'));
+    await tester.ensureVisible(find.text('Resident'));
+    await tester.tap(find.text('Resident'));
     await tester.pumpAndSettle();
     expect(find.byType(NavigationBar), findsOneWidget);
     expect(find.text('Hello, Resident'), findsOneWidget);
@@ -40,8 +40,8 @@ void main() {
   });
   testWidgets('official demo opens the management role', (tester) async {
     await loadApp(tester);
-    await tester.ensureVisible(find.text('Official demo'));
-    await tester.tap(find.text('Official demo'));
+    await tester.ensureVisible(find.text('Barangay Official'));
+    await tester.tap(find.text('Barangay Official'));
     await tester.pumpAndSettle();
     await tester.tap(
       find.descendant(
@@ -51,7 +51,7 @@ void main() {
     );
     await tester.pumpAndSettle();
     expect(find.text('Barangay Official'), findsOneWidget);
-    expect(find.textContaining('Barangay Official workspace'), findsOneWidget);
+    expect(find.text('BARANGAY OFFICIAL · PUROK 3'), findsOneWidget);
     await tester.tap(
       find.descendant(
         of: find.byType(NavigationBar),

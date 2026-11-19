@@ -95,11 +95,6 @@ class ProfilePage extends StatelessWidget {
           title: 'My Reports',
           subtitle: 'Your reports and status history',
           onTap: () => open('reports'),
-        )
-      else
-        const Notice(
-          'You are using the Barangay Official workspace. Use the dashboard tabs to review reports, publish notices, and manage service information.',
-          icon: Icons.verified_user_outlined,
         ),
       MenuCard(
         icon: Icons.menu_book_outlined,

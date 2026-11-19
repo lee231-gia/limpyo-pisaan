@@ -329,8 +329,10 @@ class AppState extends ChangeNotifier {
     await prefs.setString('email', address.trim());
     await prefs.setBool('welcomed', true);
     await prefs.setBool('signedIn', true);
+    await prefs.setBool('isOfficial', false);
     name = fullName.trim();
     email = address.trim();
+    isOfficial = false;
     stage = AuthStage.app;
     notifyListeners();
   }
@@ -357,6 +359,8 @@ class AppState extends ChangeNotifier {
 
   Future<void> logout() async {
     await prefs.setBool('signedIn', false);
+    await prefs.setBool('isOfficial', false);
+    isOfficial = false;
     stage = AuthStage.login;
     notifyListeners();
   }

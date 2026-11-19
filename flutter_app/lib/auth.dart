@@ -346,18 +346,18 @@ class _AuthScreenState extends State<AuthScreen> {
                         child: TextButton(
                           onPressed: busy ? null : () => signIn(guest: true),
                           child: const Text(
-                            'Continue as guest →',
-                            style: TextStyle(fontSize: 12),
+                            'Continue as resident →',
+                            style: TextStyle(fontSize: 13),
                           ),
                         ),
                       ),
                       space(15),
                       const Center(
                         child: Text(
-                          'PRESENTATION DEMOS',
+                          'CHOOSE A DEMO WORKSPACE',
                           style: TextStyle(
                             color: muted,
-                            fontSize: 9,
+                            fontSize: 10,
                             fontWeight: FontWeight.w700,
                             letterSpacing: 1.1,
                           ),
@@ -371,8 +371,8 @@ class _AuthScreenState extends State<AuthScreen> {
                               onPressed: busy ? null : () => enterDemo(false),
                               icon: const Icon(Icons.person_outline, size: 17),
                               label: const Text(
-                                'Resident demo',
-                                style: TextStyle(fontSize: 10),
+                                'Resident',
+                                style: TextStyle(fontSize: 12),
                               ),
                             ),
                           ),
@@ -385,8 +385,8 @@ class _AuthScreenState extends State<AuthScreen> {
                                 size: 17,
                               ),
                               label: const Text(
-                                'Official demo',
-                                style: TextStyle(fontSize: 10),
+                                'Barangay Official',
+                                style: TextStyle(fontSize: 12),
                               ),
                             ),
                           ),

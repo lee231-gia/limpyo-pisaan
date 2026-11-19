@@ -19,8 +19,8 @@ ThemeData appTheme() => ThemeData(
   ),
   scaffoldBackgroundColor: cream,
   textTheme: const TextTheme(
-    bodyMedium: TextStyle(color: ink, fontSize: 14, height: 1.5),
-    bodySmall: TextStyle(color: muted, fontSize: 12, height: 1.5),
+    bodyMedium: TextStyle(color: ink, fontSize: 15, height: 1.55),
+    bodySmall: TextStyle(color: muted, fontSize: 13, height: 1.55),
     titleLarge: TextStyle(
       color: ink,
       fontSize: 23,
@@ -29,7 +29,7 @@ ThemeData appTheme() => ThemeData(
     ),
     titleMedium: TextStyle(
       color: ink,
-      fontSize: 17,
+      fontSize: 18,
       fontWeight: FontWeight.w700,
     ),
     headlineMedium: TextStyle(
@@ -50,7 +50,7 @@ ThemeData appTheme() => ThemeData(
     filled: true,
     fillColor: Colors.white,
     contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 16),
-    hintStyle: TextStyle(color: muted.withValues(alpha: .7), fontSize: 13),
+    hintStyle: TextStyle(color: muted.withValues(alpha: .7), fontSize: 14),
     border: OutlineInputBorder(
       borderRadius: BorderRadius.circular(11),
       borderSide: const BorderSide(color: line),
@@ -70,7 +70,7 @@ ThemeData appTheme() => ThemeData(
       foregroundColor: Colors.white,
       minimumSize: const Size(0, 50),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(11)),
-      textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+      textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
     ),
   ),
   outlinedButtonTheme: OutlinedButtonThemeData(
@@ -87,10 +87,10 @@ ThemeData appTheme() => ThemeData(
     backgroundColor: Colors.white,
     surfaceTintColor: Colors.transparent,
     indicatorColor: pale,
-    height: 72,
+    height: 76,
     labelTextStyle: WidgetStateProperty.resolveWith(
       (states) => TextStyle(
-        fontSize: 10,
+        fontSize: 11,
         fontWeight: states.contains(WidgetState.selected)
             ? FontWeight.w700
             : FontWeight.w400,
@@ -231,7 +231,7 @@ class Notice extends StatelessWidget {
           child: Text(
             text,
             style: TextStyle(
-              fontSize: 11,
+              fontSize: 12,
               height: 1.6,
               color: green.withValues(alpha: .8),
             ),
@@ -260,7 +260,7 @@ class Tag extends StatelessWidget {
       text,
       style: const TextStyle(
         color: green,
-        fontSize: 9,
+        fontSize: 10,
         fontWeight: FontWeight.w600,
       ),
     ),
@@ -339,7 +339,7 @@ class MenuCard extends StatelessWidget {
                     Text(
                       title,
                       style: TextStyle(
-                        fontSize: 13,
+                        fontSize: 14,
                         fontWeight: FontWeight.w700,
                         color: danger ? const Color(0xFFAC4943) : ink,
                       ),
@@ -351,7 +351,7 @@ class MenuCard extends StatelessWidget {
                           subtitle,
                           style: const TextStyle(
                             color: muted,
-                            fontSize: 11,
+                            fontSize: 12,
                             height: 1.6,
                           ),
                         ),
@@ -395,7 +395,7 @@ Widget eyebrow(String text) => Text(
   text,
   style: const TextStyle(
     color: Color(0xFF78936A),
-    fontSize: 9,
+    fontSize: 10,
     letterSpacing: 1.3,
     fontWeight: FontWeight.w600,
   ),
@@ -405,9 +405,9 @@ Widget detail(String label, String value) => Padding(
   child: Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Text(label, style: const TextStyle(color: muted, fontSize: 10)),
+      Text(label, style: const TextStyle(color: muted, fontSize: 11)),
       space(6),
-      Text(value, style: const TextStyle(fontSize: 13, height: 1.65)),
+      Text(value, style: const TextStyle(fontSize: 14, height: 1.65)),
     ],
   ),
 );
